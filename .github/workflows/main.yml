@@ -1,0 +1,34 @@
+name: Generate rules
+
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: "0 3 1,6,11,16,21,26 * *"
+
+jobs:
+  deploy:
+    name: Generate rules
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # To push a branch
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Init repo
+      shell: bash
+      run: |
+        git config --local user.name "GitHub Action"
+        git config --local user.email "actions-user@users.noreply.github.com"
+
+    - name: Commit and push files
+      shell: bash
+      env:
+        Branch: provider
+      run: |
+        git fetch --no-tags --prune --no-recurse-submodules --depth=1 origin $Branch
+        git checkout --force -B $Branch refs/remotes/origin/$Branch
+        chmod +x ./gen_rules.sh
+        sh ./gen_rules.sh
+        git add .
+        git commit -m "$(date +%F)"
+        git push origin $Branch

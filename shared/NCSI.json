@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "domain": [
+        "captive.apple.com",
+        "networkcheck.kde.org",
+        "network-test.debian.org",
+        "nmcheck.gnome.org",
+        "www.archlinux.org",
+        "detectportal.firefox.com",
+        "start.ubuntu.com",
+        "capnet.elementary.io",
+        "edge.microsoft.com",
+        "connectivitycheck.gstatic.com",
+        "connectivitycheck.android.com",
+        "connect.rom.miui.com",
+        "connectivitycheck.platform.hicloud.com"
+      ],
+      "domain_suffix": [
+        ".msftconnecttest.com",
+        ".msftncsi.com"
+      ]
+    }
+  ]
+}

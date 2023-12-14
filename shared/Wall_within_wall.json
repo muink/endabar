@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "domain_suffix": [
+        ".pincong.rocks",
+        ".chinadigitaltimes.net",
+        ".voanews.com",
+        ".voachinese.com",
+        ".rfa.org",
+        ".__rfi.fr",
+        ".__dw.com",
+        ".dafahao.com",
+        ".minghui.org",
+        ".mhradio.org",
+        ".dongtaiwang.com",
+        ".epochtimes.com",
+        ".theepochtimes.com",
+        ".ntdtv.com",
+        ".falundafa.org",
+        ".faluninfo.net",
+        ".wujieliulan.com",
+        ".zhengjian.org",
+        ".bannedbook.org",
+        ".bannedbook.net",
+        ".botanwang.com",
+        ".jinpianwang.com",
+        ".xizang-zhiye.org",
+        ".mingjingnews.com"
+      ]
+    }
+  ]
+}

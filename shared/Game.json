@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "domain_suffix": [
+        ".__Steam__",
+        ".steampowered.com",
+        ".steamcommunity.com",
+        ".steam-api.com",
+        ".steam-chat.com",
+        ".steamdeck.com",
+        ".steamgames.com",
+        ".steamusercontent.com",
+        ".steamstatic.com",
+        ".akamaihd.net",
+        ".steamserver.net",
+        ".__Others__",
+        ".srv.nintendo.net",
+        ".stun.playstation.net",
+        ".xboxlive.com"
+      ],
+      "domain_regex": [
+        "^xbox\\..+\\.microsoft\\.com$"
+      ]
+    }
+  ]
+}

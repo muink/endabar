@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "domain_suffix": [
+        ".biliapi.net",
+        ".bilibili.com",
+        ".bilivideo.com",
+        ".acgvideo.com",
+        ".hdslb.com"
+      ],
+      "package_name": [
+        "com.bilibili.app.in",
+        "tv.danmaku.bili"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "domain": [
+        "__Google-DL__",
+        "dl.google.com",
+        "__Openwrt__",
+        "downloads.openwrt.org"
+      ],
+      "domain_suffix": [
+        ".__Steam__",
+        ".steamcontent.com",
+        ".__Youtube__",
+        ".googlevideo.com",
+        ".__Google-drive__",
+        ".googleusercontent.com",
+        ".__cloud.mail.ru__",
+        ".mail.ru",
+        ".datacloudmail.ru",
+        ".imgsmail.ru"
+      ]
+    }
+  ]
+}
