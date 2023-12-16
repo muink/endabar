@@ -4,10 +4,11 @@
     {
       "domain": [
         "captive.apple.com",
-        "networkcheck.kde.org",
         "network-test.debian.org",
         "nmcheck.gnome.org",
         "www.archlinux.org",
+        "ping.archlinux.org",
+        "networkcheck.kde.org",
         "detectportal.firefox.com",
         "start.ubuntu.com",
         "capnet.elementary.io",
