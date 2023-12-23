@@ -82,6 +82,64 @@ writedomain() {
 	EOF
 }
 
+# convertList <repo> <src> <dst>
+convertList() {
+	cat <<-EOF > "$3"
+		{
+		  "__Source__": "$1",
+		  "__last_modified__": "$(date -u '+%F %T %Z')",
+		  "version": 1,
+		  "rules": [
+		    {
+	EOF
+	for _key in $(sed 's|#.*||g;s|\(IP-CIDR\)6|\1|' "$2" | cut -f1 -d',' | sort -u); do
+		case "$_key" in
+			DOMAIN)
+				cat <<-EOF >> "$3"
+					      "domain": [
+					$(sed -En '/^DOMAIN,/{s|^[^,]+,([^,]+).*|        "\1",|p}' "$2" | sed '${s|,$||}')
+					      ],
+				EOF
+			;;
+			DOMAIN-SUFFIX)
+				cat <<-EOF >> "$3"
+					      "domain_suffix": [
+					$(sed -En '/^DOMAIN-SUFFIX,/{s|^[^,]+,([^,]+).*|        ".\1",|p}' "$2" | sed '${s|,$||}')
+					      ],
+				EOF
+			;;
+			DOMAIN-KEYWORD)
+				cat <<-EOF >> "$3"
+					      "domain_keyword": [
+					$(sed -En '/^DOMAIN-KEYWORD,/{s|^[^,]+,([^,]+).*|        "\1",|p}' "$2" | sed '${s|,$||}')
+					      ],
+				EOF
+			;;
+			IP-CIDR)
+				cat <<-EOF >> "$3"
+					      "ip_cidr": [
+					$(sed -En '/^(IP-CIDR|IP-CIDR6),/{s|^[^,]+,([^,]+).*|        "\1",|p}' "$2" | sed '${s|,$||}')
+					      ],
+				EOF
+			;;
+			PROCESS-NAME)
+				# process_name or package_name
+				echo "$_key" is not support.
+			;;
+			*)
+				# Others
+				echo "$_key" is not support.
+			;;
+		esac 
+	done
+	$SED -i '${s|,$||}' "$3"
+	cat <<-EOF >> "$3"
+		    }
+		  ]
+		}
+	EOF
+}
+
 push() {
 	cd "$1" # github runner not support pushd
 }
@@ -258,10 +316,29 @@ updatev2rayrulesdat() {
 	downloadto 'https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/win-update.txt' win-update.tmp
 	downloadto 'https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/win-extra.txt' win-extra.tmp
 	for f in reject-list.tmp win-spy.tmp win-update.tmp win-extra.tmp; do
-		$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$f"
-		sort -u "$f" -o "$f"
-		writedomain "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/${f%.*}.txt" "$f" "${f%.*}.json"
-		compilesrs "${f%.*}.json"
+		$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$(basename $f)"
+		sort -u "$(basename $f)" -o "$(basename $f)"
+		writedomain "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/${f%.*}.txt" "$(basename $f)" "$(basename -s.tmp $f).json"
+		compilesrs "$(basename -s.tmp $f).json"
+	done
+
+	# Cleanup
+	rm -f *.tmp
+	pop
+}
+
+updateACL4SSR() {
+	push ACL4SSR
+	# ACL4SSR
+	downloadto 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ProxyLite.list' ProxyLite.tmp
+	downloadto 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ProxyMedia.list' ProxyMedia.tmp
+	downloadto 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ChinaMedia.list' ChinaMedia.tmp
+	downloadto 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/PrivateTracker.list' PrivateTracker.tmp
+	for f in ProxyLite.tmp ProxyMedia.tmp ChinaMedia.tmp Ruleset/PrivateTracker.tmp; do
+		$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$(basename $f)"
+		sort -u "$(basename $f)" -o "$(basename $f)"
+		convertList "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/${f%.*}.list" "$(basename $f)" "$(basename -s.tmp $f).json"
+		compilesrs "$(basename -s.tmp $f).json"
 	done
 
 	# Cleanup
@@ -292,3 +369,4 @@ update_ipcidr
 update_cndomain
 update_gfwdomain
 updatev2rayrulesdat
+updateACL4SSR
