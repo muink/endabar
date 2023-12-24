@@ -23,7 +23,7 @@ jobs:
     - name: Commit and push files
       shell: bash
       env:
-        Branch: provider
+        Branch: ruleset
       run: |
         git fetch --no-tags --prune --no-recurse-submodules --depth=1 origin $Branch
         git checkout --force -B $Branch refs/remotes/origin/$Branch

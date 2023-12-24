@@ -318,7 +318,7 @@ updatev2rayrulesdat() {
 	for f in reject-list.tmp win-spy.tmp win-update.tmp win-extra.tmp; do
 		$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$(basename $f)"
 		sort -u "$(basename $f)" -o "$(basename $f)"
-		writedomain "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/${f%.*}.txt" "$(basename $f)" "$(basename -s.tmp $f).json"
+		writedomain "https://github.com/Loyalsoldier/v2ray-rules-dat/tree/release/${f%.*}.txt" "$(basename $f)" "$(basename -s.tmp $f).json"
 		compilesrs "$(basename -s.tmp $f).json"
 	done
 
@@ -337,7 +337,7 @@ updateACL4SSR() {
 	for f in ProxyLite.tmp ProxyMedia.tmp ChinaMedia.tmp Ruleset/PrivateTracker.tmp; do
 		$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$(basename $f)"
 		sort -u "$(basename $f)" -o "$(basename $f)"
-		convertList "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/${f%.*}.list" "$(basename $f)" "$(basename -s.tmp $f).json"
+		convertList "https://github.com/ACL4SSR/ACL4SSR/tree/master/Clash/${f%.*}.list" "$(basename $f)" "$(basename -s.tmp $f).json"
 		compilesrs "$(basename -s.tmp $f).json"
 	done
 
@@ -357,7 +357,7 @@ updateLM_Firefly() {
 	for f in Special/App-Activation.tmp Special/DMCA-Sensitive.tmp Special/NTP-Service.tmp GlobalMedia.tmp SpeedTest.tmp; do
 		$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$(basename $f)"
 		sort -u "$(basename $f)" -o "$(basename $f)"
-		convertList "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/${f%.*}.list" "$(basename $f)" "$(basename -s.tmp $f).json"
+		convertList "https://github.com/LM-Firefly/Rules/tree/master/${f%.*}.list" "$(basename $f)" "$(basename -s.tmp $f).json"
 		compilesrs "$(basename -s.tmp $f).json"
 	done
 
