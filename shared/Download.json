@@ -6,7 +6,9 @@
         "__Google-DL__",
         "dl.google.com",
         "__Openwrt__",
-        "downloads.openwrt.org"
+        "downloads.openwrt.org",
+        "__Oculus__",
+        "securecdn.oculus.com"
       ],
       "domain_suffix": [
         ".__Steam__",
