@@ -3,13 +3,13 @@
   "rules": [
     {
       "domain_suffix": [
-        "+.amd.com",
-        "+.intel.com",
-        "+.asus.com",
-        "+.asrock.com",
-        "+.msi.com",
-        "+.gigabyte.com",
-        "+.nvidia.com"
+        ".amd.com",
+        ".intel.com",
+        ".asus.com",
+        ".asrock.com",
+        ".msi.com",
+        ".gigabyte.com",
+        ".nvidia.com"
       ]
     }
   ]
