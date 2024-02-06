@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CURRENTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CURRENTDIR="$(cd $(dirname $0); pwd)"
 DSTDIR="$CURRENTDIR/shared"
 
 
@@ -370,7 +370,7 @@ updateLM_Firefly() {
 
 # init
 getSysinfo
-[ "$OS" == "darwin" ] && SED=gsed || SED=sed
+[ "$OS" = "darwin" ] && SED=gsed || SED=sed
 if [ -n "${OS:+$OS-}$ARCH" ]; then
 	SINGBOX="${OS:+$OS-}$ARCH"
 	[ "$OS" == "windows" ] && SINGBOX="${SINGBOX}.exe"
@@ -379,7 +379,7 @@ if [ -n "${OS:+$OS-}$ARCH" ]; then
 		git fetch --no-tags --prune --no-recurse-submodules --depth=1 origin singbox
 		git checkout origin/singbox -- $SINGBOX 2>/dev/null
 		git reset HEAD $SINGBOX 2>/dev/null
-		chmod +x $SINGBOX 2>/dev/nul
+		chmod +x $SINGBOX 2>/dev/null
 	}
 	SINGBOX="$CURRENTDIR/$SINGBOX"
 fi
