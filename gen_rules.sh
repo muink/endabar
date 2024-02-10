@@ -64,15 +64,9 @@ writedomain() {
 		  "version": 1,
 		  "rules": [
 		    {
-		      "domain": [
-	EOF
-	$SED -En 's|^|        "|; s|$|",|; p' "$2" >> "$3"
-	$SED -i '${s|,$||}' "$3"
-	cat <<-EOF >> "$3"
-		      ],
 		      "domain_suffix": [
 	EOF
-	$SED -En 's|^|        ".|; s|$|",|; p' "$2" >> "$3"
+	$SED -En 's|^|        "|; s|$|",|; p' "$2" >> "$3"
 	$SED -i '${s|,$||}' "$3"
 	cat <<-EOF >> "$3"
 		      ]
@@ -104,7 +98,7 @@ convertList() {
 			DOMAIN-SUFFIX)
 				cat <<-EOF >> "$3"
 					      "domain_suffix": [
-					$(sed -En '/^DOMAIN-SUFFIX,/{s|^[^,]+,([^,]+).*|        ".\1",|p}' "$2" | sed '${s|,$||}')
+					$(sed -En '/^DOMAIN-SUFFIX,/{s|^[^,]+,([^,]+).*|        "\1",|p}' "$2" | sed '${s|,$||}')
 					      ],
 				EOF
 			;;
@@ -295,7 +289,7 @@ updatev2rayrulesdat() {
 		      ],
 		      "domain_suffix": [
 	EOF
-	$SED -En 's|^|        ".|; s|$|",|; p' "${SRC%.*}.suffix.tmp" >> "$DST"
+	$SED -En 's|^|        "|; s|$|",|; p' "${SRC%.*}.suffix.tmp" >> "$DST"
 	$SED -i '${s|,$||}' "$DST"
 	cat <<-EOF >> "$DST"
 		      ],
