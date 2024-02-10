@@ -130,7 +130,7 @@ convertList() {
 				# Others
 				echo "$_key" is not support.
 			;;
-		esac 
+		esac
 	done
 	$SED -i '${s|,$||}' "$3"
 	cat <<-EOF >> "$3"
@@ -219,7 +219,7 @@ update_cndomain() {
 	#DST='ChinaDomainModified.json'
 	#downloadto 'https://raw.githubusercontent.com/muink/dnsmasq-china-tool/list/accelerated-domains.china.conf' "$SRC"
 	#$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$SRC"
-	#$SED -Ei "s|/[0-9]+(\.[0-9]+){3}$||; s|^server=/||" "$SRC"
+	#$SED -Ei "s|^server=/||; s|/.*$||" "$SRC"
 	#sort -u "$SRC" -o "$SRC"
 	#writedomain "https://github.com/muink/dnsmasq-china-tool/blob/list/accelerated-domains.china.conf" "$SRC" "$DST"
 	#compilesrs "$DST"
@@ -229,7 +229,7 @@ update_cndomain() {
 	DST='ChinaDomainModified2.json'
 	downloadto 'https://raw.githubusercontent.com/muink/dnsmasq-china-tool/list/accelerated-domains2.china.conf' "$SRC"
 	$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$SRC"
-	$SED -Ei "s|/[0-9]+(\.[0-9]+){3}$||; s|^server=/||" "$SRC"
+	$SED -Ei "s|^server=/||; s|/.*$||" "$SRC"
 	sort -u "$SRC" -o "$SRC"
 	writedomain "https://github.com/muink/dnsmasq-china-tool/blob/list/accelerated-domains2.china.conf" "$SRC" "$DST"
 	compilesrs "$DST"
@@ -239,7 +239,7 @@ update_cndomain() {
 	DST='ChinaDomain.json'
 	downloadto 'https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf' "$SRC"
 	$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$SRC"
-	$SED -Ei "s|/[0-9]+(\.[0-9]+){3}$||; s|^server=/||" "$SRC"
+	$SED -Ei "s|^server=/||; s|/.*$||" "$SRC"
 	sort -u "$SRC" -o "$SRC"
 	writedomain "https://github.com/felixonmars/dnsmasq-china-list/blob/master/accelerated-domains.china.conf" "$SRC" "$DST"
 	compilesrs "$DST"
@@ -258,7 +258,7 @@ update_gfwdomain() {
 	downloadto 'https://raw.githubusercontent.com/cokebar/gfwlist2dnsmasq/master/gfwlist2dnsmasq.sh' gfwlist2dnsmasq.sh
 	bash gfwlist2dnsmasq.sh -o "$SRC"
 	$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$SRC"
-	$SED -Ei "s|/[0-9]+(\.[0-9]+){3}$||; s|^server=/||" "$SRC"
+	$SED -Ei "s|^server=/||; s|/.*$||" "$SRC"
 	sort -u "$SRC" -o "$SRC"
 	writedomain "https://github.com/gfwlist/gfwlist/blob/master/gfwlist.txt" "$SRC" "$DST"
 	compilesrs "$DST"
@@ -278,7 +278,7 @@ updatev2rayrulesdat() {
 	$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$SRC"
 	sort -u "$SRC" -o "$SRC"
 	$SED -En 's|^full:(.+)$|\1|p' "$SRC" > "${SRC%.*}.full.tmp" #&& $SED -i '/^full:/d' "$SRC"
-	grep -E '^[a-zA-Z0-9\.-]+$' "$SRC" > "${SRC%.*}.suffix.tmp" #&& $SED -Ei '/^[a-zA-Z0-9\.-]+$/d' "$SRC"
+	grep -E '^[[:alnum:]_\.-]+$' "$SRC" > "${SRC%.*}.suffix.tmp" #&& $SED -Ei '/^[a-zA-Z0-9\.-]+$/d' "$SRC"
 	$SED -En 's|^regexp:(.+)$|\1|;s|\\|\\\\|gp' "$SRC" > "${SRC%.*}.regexp.tmp" #&& $SED -i '/^regexp:/d' "$SRC"
 	cat <<-EOF > "$DST"
 		{
