@@ -8,7 +8,9 @@
         "__Openwrt__",
         "downloads.openwrt.org",
         "__Oculus__",
-        "securecdn.oculus.com"
+        "securecdn.oculus.com",
+        "__Nvidia__",
+        "international-gfe.download.nvidia.com"
       ],
       "domain_suffix": [
         ".__Steam__",
