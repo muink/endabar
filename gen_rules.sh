@@ -55,8 +55,8 @@ downloadto() {
 	curl -Lo "$2" "$1" && echo >> "$2"
 }
 
-# writedomain <repo> <src> <dst>
-writedomain() {
+# convertDnsmasq <repo> <src> <dst>
+convertDnsmasq() {
 	cat <<-EOF > "$3"
 		{
 		  "__Source__": "$1",
@@ -215,7 +215,7 @@ update_cndomain() {
 	#$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$SRC"
 	#$SED -Ei "s|^server=/||; s|/.*$||" "$SRC"
 	#sort -u "$SRC" -o "$SRC"
-	#writedomain "https://github.com/muink/dnsmasq-china-tool/blob/list/accelerated-domains.china.conf" "$SRC" "$DST"
+	#convertDnsmasq "https://github.com/muink/dnsmasq-china-tool/blob/list/accelerated-domains.china.conf" "$SRC" "$DST"
 	#compilesrs "$DST"
 
 	## China Domain Modified 2
@@ -225,7 +225,7 @@ update_cndomain() {
 	$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$SRC"
 	$SED -Ei "s|^server=/||; s|/.*$||" "$SRC"
 	sort -u "$SRC" -o "$SRC"
-	writedomain "https://github.com/muink/dnsmasq-china-tool/blob/list/accelerated-domains2.china.conf" "$SRC" "$DST"
+	convertDnsmasq "https://github.com/muink/dnsmasq-china-tool/blob/list/accelerated-domains2.china.conf" "$SRC" "$DST"
 	compilesrs "$DST"
 
 	## China Domain
@@ -235,7 +235,7 @@ update_cndomain() {
 	$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$SRC"
 	$SED -Ei "s|^server=/||; s|/.*$||" "$SRC"
 	sort -u "$SRC" -o "$SRC"
-	writedomain "https://github.com/felixonmars/dnsmasq-china-list/blob/master/accelerated-domains.china.conf" "$SRC" "$DST"
+	convertDnsmasq "https://github.com/felixonmars/dnsmasq-china-list/blob/master/accelerated-domains.china.conf" "$SRC" "$DST"
 	compilesrs "$DST"
 
 	# Cleanup
@@ -254,7 +254,7 @@ update_gfwdomain() {
 	$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$SRC"
 	$SED -Ei "s|^server=/||; s|/.*$||" "$SRC"
 	sort -u "$SRC" -o "$SRC"
-	writedomain "https://github.com/gfwlist/gfwlist/blob/master/gfwlist.txt" "$SRC" "$DST"
+	convertDnsmasq "https://github.com/gfwlist/gfwlist/blob/master/gfwlist.txt" "$SRC" "$DST"
 	compilesrs "$DST"
 
 	# Cleanup
@@ -312,7 +312,7 @@ updatev2rayrulesdat() {
 	for f in reject-list.tmp win-spy.tmp win-update.tmp win-extra.tmp; do
 		$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$(basename $f)"
 		sort -u "$(basename $f)" -o "$(basename $f)"
-		writedomain "https://github.com/Loyalsoldier/v2ray-rules-dat/tree/release/${f%.*}.txt" "$(basename $f)" "$(basename -s.tmp $f).json"
+		convertDnsmasq "https://github.com/Loyalsoldier/v2ray-rules-dat/tree/release/${f%.*}.txt" "$(basename $f)" "$(basename -s.tmp $f).json"
 		compilesrs "$(basename -s.tmp $f).json"
 	done
 
