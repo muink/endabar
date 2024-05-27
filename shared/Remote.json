@@ -3,8 +3,8 @@
   "rules": [
     {
       "domain_suffix": [
-        ".net.anydesk.com",
-        ".parsec.app"
+        "net.anydesk.com",
+        "parsec.app"
       ]
     }
   ]

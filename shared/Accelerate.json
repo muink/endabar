@@ -3,11 +3,11 @@
   "rules": [
     {
       "domain_suffix": [
-        ".pushbullet.com",
-        ".gettoby.com",
-        ".microsoft.com",
-        ".live.com",
-        ".hinet.net"
+        "pushbullet.com",
+        "gettoby.com",
+        "microsoft.com",
+        "live.com",
+        "hinet.net"
       ]
     }
   ]

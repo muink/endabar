@@ -13,14 +13,14 @@
         "international-gfe.download.nvidia.com"
       ],
       "domain_suffix": [
-        ".__Steam__",
+        "__Steam__",
         ".steamcontent.com",
-        ".__Youtube__",
+        "__Youtube__",
         ".googlevideo.com",
-        ".__Google-drive__",
+        "__Google-drive__",
         ".googleusercontent.com",
-        ".__cloud.mail.ru__",
-        ".mail.ru",
+        "__cloud.mail.ru__",
+        "mail.ru",
         ".datacloudmail.ru",
         ".imgsmail.ru"
       ]
