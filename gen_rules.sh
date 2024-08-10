@@ -343,11 +343,13 @@ updateACL4SSR() {
 updateLM_Firefly() {
 	push LM-Firefly
 	# LM-Firefly
+	downloadto 'https://raw.githubusercontent.com/LM-Firefly/Rules/master/Adblock/Adblock.list' Adblock.tmp
 	downloadto 'https://raw.githubusercontent.com/LM-Firefly/Rules/master/Special/App-Activation.list' App-Activation.tmp
 	downloadto 'https://raw.githubusercontent.com/LM-Firefly/Rules/master/Special/NTP-Service.list' NTP-Service.tmp
+	downloadto 'https://raw.githubusercontent.com/LM-Firefly/Rules/master/Game.list' Game.tmp
 	downloadto 'https://raw.githubusercontent.com/LM-Firefly/Rules/master/GlobalMedia.list' GlobalMedia.tmp
 	downloadto 'https://raw.githubusercontent.com/LM-Firefly/Rules/master/SpeedTest.list' SpeedTest.tmp
-	for f in Special/App-Activation.tmp Special/NTP-Service.tmp GlobalMedia.tmp SpeedTest.tmp; do
+	for f in Adblock/Adblock.tmp Special/App-Activation.tmp Special/NTP-Service.tmp Game.tmp GlobalMedia.tmp SpeedTest.tmp; do
 		$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$(basename $f)"
 		sort -u "$(basename $f)" -o "$(basename $f)"
 		convertList "https://github.com/LM-Firefly/Rules/tree/master/${f%.*}.list" "$(basename $f)" "$(basename -s.tmp $f).json"
