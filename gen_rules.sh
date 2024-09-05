@@ -152,21 +152,13 @@ update_ipcidr() {
 	# China IP
 	## IPv4
 	IPv4='IPv4.tmp'
-	downloadto 'https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt' ipip.tmp
-	downloadto 'https://raw.githubusercontent.com/metowolf/iplist/master/data/special/china.txt' cz88.tmp
-	downloadto 'https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt' coipv4.tmp
-	## Merge IPv4
-	cat ipip.tmp cz88.tmp coipv4.tmp | sort -u > "$IPv4"
+	downloadto 'https://raw.githubusercontent.com/muink/route-list/release/china_ipv4.txt' "$IPv4"
 	$SED -i '/#.*/d; /^\s*$/d; s|\s||g' "$IPv4"
-	sort -n -t'.' -k1,1 -k2,2 -k3,3 -k4,4 "$IPv4" -o "$IPv4"
 
 	## IPv6
 	IPv6='IPv6.tmp'
-	downloadto 'https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt' coipv6.tmp
-	downloadto 'http://www.ipdeny.com/ipv6/ipaddresses/aggregated/cn-aggregated.zone' ipdeny6.tmp && $SED -Ei 's|(:0{1,4})+/|::/|' ipdeny6.tmp
-	## Merge IPv6
-	cat coipv6.tmp ipdeny6.tmp | sort -u > "$IPv6"
-	$SED -i '/^#/d; /^\s*$/d; s|\s||g' "$IPv6"
+	downloadto 'https://raw.githubusercontent.com/muink/route-list/release/china_ipv6.txt' "$IPv6"
+	$SED -i '/#.*/d; /^\s*$/d; s|\s||g' "$IPv6"
 
 	# Merge IPv4 IPv6
 	ChinaIP='ChinaIP.json'
@@ -174,13 +166,10 @@ update_ipcidr() {
 		{
 		  "__Source__": {
 		    "ipv4": {
-		      "ipip": "https://github.com/17mon/china_ip_list/blob/master/china_ip_list.txt",
-		      "cz88": "https://github.com/metowolf/iplist/blob/master/data/special/china.txt",
-		      "coip": "https://github.com/gaoyifan/china-operator-ip/blob/ip-lists/china.txt"
+		      "rols": "https://github.com/muink/route-list/blob/release/china_ipv4.txt"
 		    },
 		    "ipv6": {
-		      "deny6": "http://www.ipdeny.com/ipv6/ipaddresses/aggregated/cn-aggregated.zone",
-		      "coip6": "https://github.com/gaoyifan/china-operator-ip/blob/ip-lists/china6.txt"
+		      "rols6": "https://github.com/muink/route-list/blob/release/china_ipv6.txt"
 		    }
 		  },
 		  "__last_modified__": "$(date -u '+%F %T %Z')",
@@ -208,34 +197,20 @@ update_ipcidr() {
 update_cndomain() {
 	push 01
 	# China Domain
-	## China Domain Modified
-	#SRC='ChinaDomainModified.tmp'
-	#DST='ChinaDomainModified.json'
-	#downloadto 'https://raw.githubusercontent.com/muink/dnsmasq-china-tool/list/accelerated-domains.china.conf' "$SRC"
-	#$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$SRC"
-	#$SED -Ei "s|^server=/||; s|/.*$||" "$SRC"
-	#sort -u "$SRC" -o "$SRC"
-	#convertDnsmasq "https://github.com/muink/dnsmasq-china-tool/blob/list/accelerated-domains.china.conf" "$SRC" "$DST"
-	#compilesrs "$DST"
+	## China Domain
+	SRC='ChinaDomain.tmp'
+	DST='ChinaDomain.json'
+	downloadto 'https://raw.githubusercontent.com/muink/route-list/release/china_list.txt' "$SRC"
+	$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$SRC"
+	convertDnsmasq "https://github.com/muink/route-list/blob/release/china_list.txt" "$SRC" "$DST"
+	compilesrs "$DST"
 
 	## China Domain Modified 2
 	SRC='ChinaDomainModified2.tmp'
 	DST='ChinaDomainModified2.json'
-	downloadto 'https://raw.githubusercontent.com/muink/dnsmasq-china-tool/list/accelerated-domains2.china.conf' "$SRC"
+	downloadto 'https://raw.githubusercontent.com/muink/route-list/release/china_list2.txt' "$SRC"
 	$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$SRC"
-	$SED -Ei "s|^server=/||; s|/.*$||" "$SRC"
-	sort -u "$SRC" -o "$SRC"
-	convertDnsmasq "https://github.com/muink/dnsmasq-china-tool/blob/list/accelerated-domains2.china.conf" "$SRC" "$DST"
-	compilesrs "$DST"
-
-	## China Domain
-	SRC='ChinaDomain.tmp'
-	DST='ChinaDomain.json'
-	downloadto 'https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf' "$SRC"
-	$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$SRC"
-	$SED -Ei "s|^server=/||; s|/.*$||" "$SRC"
-	sort -u "$SRC" -o "$SRC"
-	convertDnsmasq "https://github.com/felixonmars/dnsmasq-china-list/blob/master/accelerated-domains.china.conf" "$SRC" "$DST"
+	convertDnsmasq "https://github.com/muink/route-list/blob/release/china_list2.txt" "$SRC" "$DST"
 	compilesrs "$DST"
 
 	# Cleanup
@@ -247,18 +222,14 @@ update_gfwdomain() {
 	push 01
 	# GFW Domain
 	## GFWList
-	SRC='gfwlist.tmp'
-	DST='gfwlist.json'
-	downloadto 'https://raw.githubusercontent.com/cokebar/gfwlist2dnsmasq/master/gfwlist2dnsmasq.sh' gfwlist2dnsmasq.sh
-	bash gfwlist2dnsmasq.sh -o "$SRC"
+	downloadto 'https://raw.githubusercontent.com/muink/route-list/release/gfwlist.list' gfwlist.tmp
 	$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$SRC"
-	$SED -Ei "s|^server=/||; s|/.*$||" "$SRC"
-	sort -u "$SRC" -o "$SRC"
-	convertDnsmasq "https://github.com/gfwlist/gfwlist/blob/master/gfwlist.txt" "$SRC" "$DST"
-	compilesrs "$DST"
+	for f in gfwlist.tmp; do
+		convertList "https://github.com/muink/route-list/blob/release/${f%.*}.list" "$(basename $f)" "$(basename -s.tmp $f).json"
+		compilesrs "$(basename -s.tmp $f).json"
+	done
 
 	# Cleanup
-	rm -f gfwlist2dnsmasq.sh
 	rm -f *.tmp
 	pop
 }
