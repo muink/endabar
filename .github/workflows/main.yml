@@ -12,7 +12,7 @@ jobs:
     permissions:
       contents: write  # To push a branch
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Init repo
       shell: bash
@@ -20,15 +20,19 @@ jobs:
         git config --local user.name "GitHub Action"
         git config --local user.email "actions-user@users.noreply.github.com"
 
+    - name: Initialize Environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      shell: bash
+      run: |
+        sudo apt update
+        sudo apt -y install jq unzip gzip
+
     - name: Commit and push files
       shell: bash
-      env:
-        Branch: ruleset
       run: |
-        git fetch --no-tags --prune --no-recurse-submodules --depth=1 origin $Branch
-        git checkout --force -B $Branch refs/remotes/origin/$Branch
         chmod +x ./gen_rules.sh
         bash ./gen_rules.sh
         git add .
         git commit -m "$(date +%F)"
-        git push origin $Branch
+        git push

@@ -1,27 +1,27 @@
 #!/bin/bash
 
-CURRENTDIR="$(cd $(dirname $0); pwd)"
-DSTDIR="$CURRENTDIR/shared"
+CURDIR="$(cd $(dirname $0); pwd)"
+DSTDIR="$CURDIR/shared"
+export PATH="$PATH:$CURDIR"
 
-
-
+# return: $OS $ARCH
 getSysinfo() {
-	case "$OSTYPE" in
-		linux-gnu)
+	case "$(uname || echo $OSTYPE)" in
+		Linux|linux-gnu)
 			# Linux
-			OS=linux
+			export OS=linux
 		;;
-		darwin*)
+		Darwin|darwin*)
 			# Mac OSX
-			OS=darwin
+			export OS=darwin
 		;;
-		cygwin)
+		CYGWIN_NT*|cygwin)
 			# POSIX compatibility layer and Linux environment emulation for Windows
-			OS=windows
+			export OS=windows
 		;;
-		msys)
+		MINGW32_NT*|MINGW64_NT*|MSYS_NT*|msys)
 			# Lightweight shell and GNU utilities compiled for Windows (part of MinGW)
-			OS=windows
+			export OS=windows
 		;;
 		win32)
 			# I'm not sure this can happen.
@@ -33,108 +33,125 @@ getSysinfo() {
 		;;
 		*)
 			# Unknown.
-			return 1
+			unset OS
 		;;
 	esac
 	case "$(uname -m || echo $PROCESSOR_ARCHITECTURE)" in
 		x86_64|amd64|AMD64)
-			ARCH=amd64
+			export ARCH=amd64
 		;;
 		arm64|ARM64|aarch64|AARCH64|armv8*|ARMV8*)
-			ARCH=arm64
+			export ARCH=arm64
 		;;
 		*)
 			# Unknown.
-			return 1
+			unset ARCH
 		;;
 	esac
+	[ -n "$OS" -a -n "$ARCH" ] || >&2 echo -e "Unsupported system or architecture.\n"
+	[ "$OS" = "windows" -a "$ARCH" = "arm64" ] && >&2 echo -e "Unsupported system or architecture.\n"
+	return 0
 }
+
+getSysinfo
+[ "$OS" = "darwin" ] && SED=gsed || SED=sed
+if [ -n "$OS$ARCH" ]; then
+	MIHOMO=mihomo-$OS-$ARCH$([ "$OS" = "windows" ] && echo .exe)
+
+	[ -x "$(command -v "$MIHOMO")" ] || {
+		MIHOMO_VERSION=$(curl -L https://api.github.com/repos/MetaCubeX/mihomo/releases/latest | jq -rc '.tag_name' 2>/dev/null)
+		MIHOMOBALL=$MIHOMO-$MIHOMO_VERSION.$([ "$OS" = "windows" ] && echo zip || echo gz)
+		curl -Lo $MIHOMOBALL "https://github.com/MetaCubeX/mihomo/releases/download/$MIHOMO_VERSION/$MIHOMOBALL"
+		[ "$OS" = "windows" ] && unzip -jx $MIHOMOBALL || gzip -Nd $MIHOMOBALL
+		rm -f $MIHOMOBALL 2>/dev/null
+		chmod +x $MIHOMO
+	}
+fi
+
 
 # downloadto <url> <target>
 downloadto() {
 	curl -Lo "$2" "$1" && echo >> "$2"
 }
 
-# convertDnsmasq <repo> <src> <dst>
-convertDnsmasq() {
+# payloadDomain <repo> <src> <dst>
+payloadDomain() {
 	cat <<-EOF > "$3"
-		{
-		  "__Source__": "$1",
-		  "__last_modified__": "$(date -u '+%F %T %Z')",
-		  "version": 1,
-		  "rules": [
-		    {
-		      "domain_suffix": [
+	# Type: domain
+	# Last Modified: `date -u '+%F %T %Z'`
+	# Source:
+	# - $1
+	payload:
 	EOF
-	$SED -En 's|^|        "|; s|$|",|; p' "$2" >> "$3"
-	$SED -i '${s|,$||}' "$3"
-	cat <<-EOF >> "$3"
-		      ]
-		    }
-		  ]
-		}
-	EOF
+	$SED -En "s|^|- '|; s|$|'|; p" "$2" >> "$3"
 }
 
-# convertList <repo> <src> <dst>
-convertList() {
+# payloadClassical <repo> <src> <dst>
+payloadClassical() {
 	cat <<-EOF > "$3"
-		{
-		  "__Source__": "$1",
-		  "__last_modified__": "$(date -u '+%F %T %Z')",
-		  "version": 1,
-		  "rules": [
-		    {
+	# Type: classical
+	# Last Modified: `date -u '+%F %T %Z'`
+	# Source:
+	# - $1
+	payload:
 	EOF
-	for _key in $(sed 's|#.*||g;s|\(IP-CIDR\)6|\1|' "$2" | cut -f1 -d',' | sort -u); do
+	$SED -En "s|^(.+)|- \1|; s|^-(\s+#)| \1|; p" "$2" >> "$3"
+}
+
+# fmt2Domain <type> <src> [dst]
+fmt2Domain() {
+	local tmpfile=fmt2Domain.tmp
+
+	case "$1" in
+		dnsmasq)
+			$SED 's|^|+.|' "$2" > $tmpfile
+			;;
+		list)
+			# ONLY support DOMAIN and DOMAIN-SUFFIX
+			grep -E "^(DOMAIN|DOMAIN-SUFFIX)," "$2" | $SED 's|^DOMAIN,||; s|^DOMAIN-SUFFIX,\.|.|; s|^DOMAIN-SUFFIX,|+.|' > $tmpfile
+			;;
+	esac
+	[ -n "$3" ] && cp -f $tmpfile "$3" || cp -f $tmpfile "$2"
+}
+
+# convertClassical <src>
+convertClassical() {
+	local tmpfile_domain="${1%.*}.domain.tmp"
+	local tmpfile_ipcidr="${1%.*}.ipcidr.tmp"
+	local convfile="${1%.*}.conv"
+
+	rm -f $tmpfile_domain $tmpfile_ipcidr $convfile
+	rm -f "${1%.*}.*.mrs"
+
+	for _key in $($SED 's|#.*||g;s|\(IP-CIDR\)6|\1|' "$1" | cut -f1 -d',' | sort -u); do
 		case "$_key" in
 			DOMAIN)
-				cat <<-EOF >> "$3"
-					      "domain": [
-					$(sed -En '/^DOMAIN,/{s|^[^,]+,([^,]+).*|        "\1",|p}' "$2" | sed '${s|,$||}')
-					      ],
-				EOF
-			;;
+				$SED -En '/^DOMAIN,/{s|^[^,]+,([^,]+).*|\1|p}' "$1" >> $tmpfile_domain
+				echo "$_key": "$(grep "^$_key," "$1" | wc -l)" >> $convfile
+				;;
 			DOMAIN-SUFFIX)
-				cat <<-EOF >> "$3"
-					      "domain_suffix": [
-					$(sed -En '/^DOMAIN-SUFFIX,/{s|^[^,]+,([^,]+).*|        "\1",|p}' "$2" | sed '${s|,$||}')
-					      ],
-				EOF
-			;;
-			DOMAIN-KEYWORD)
-				cat <<-EOF >> "$3"
-					      "domain_keyword": [
-					$(sed -En '/^DOMAIN-KEYWORD,/{s|^[^,]+,([^,]+).*|        "\1",|p}' "$2" | sed '${s|,$||}')
-					      ],
-				EOF
-			;;
+				$SED -En '/^DOMAIN-SUFFIX,/{s|^[^,]+,([^,]+).*|+.\1|p}' "$1" >> $tmpfile_domain
+				echo "$_key": "$(grep "^$_key," "$1" | wc -l)" >> $convfile
+				;;
 			IP-CIDR)
-				cat <<-EOF >> "$3"
-					      "ip_cidr": [
-					$(sed -En '/^(IP-CIDR|IP-CIDR6),/{s|^[^,]+,([^,]+).*|        "\1",|p}' "$2" | sed '${s|,$||}')
-					      ],
-				EOF
-			;;
-			PROCESS-NAME)
-				# process_name or package_name
-				echo "$_key" is not support.
-			;;
+				$SED -En '/^(IP-CIDR|IP-CIDR6),/{s|^[^,]+,([^,]+).*|\1|p}' "$1" >> $tmpfile_ipcidr
+				echo "$_key": "$(grep "^$_key," "$1" | wc -l)" >> $convfile
+				;;
 			*)
 				# Others
-				echo "$_key" is not support.
-			;;
+				echo "$1": "$_key" does not support conversion to binary.
+				echo ::DROPED:: "$_key": "$(grep "^$_key," "$1" | wc -l)" >> $convfile
+				;;
 		esac
 	done
-	$SED -i '${s|,$||}' "$3"
-	cat <<-EOF >> "$3"
-		    }
-		  ]
-		}
-	EOF
+
+	[ -f "$tmpfile_domain" ] && compilemrs $tmpfile_domain domain text
+	[ -f "$tmpfile_ipcidr" ] && compilemrs $tmpfile_ipcidr ipcidr text
+	return 0
 }
 
 push() {
+	mkdir -p "$1" 2>/dev/null
 	cd "$1" # github runner not support pushd
 }
 
@@ -142,9 +159,14 @@ pop() {
 	cd .. # github runner not support popd
 }
 
-compilesrs() {
-	jq -c 'del(.__Source__) | del(.__last_modified__)' "$1" > "${1%.*}.thin.json"
-	[ -n "$SINGBOX" ] && "$SINGBOX" rule-set compile "${1%.*}.thin.json" -o "${1%.*}.srs"
+# trim <src>
+trim() {
+	$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$1"
+}
+
+# compilemrs <src> <ipcidr/domain> [src_type]
+compilemrs() {
+	[ -x "$(command -v "$MIHOMO")" ] && "$MIHOMO" convert-ruleset $2 ${3:-yaml} "$1" "${1%.*}.mrs"
 }
 
 update_ipcidr() {
@@ -153,41 +175,26 @@ update_ipcidr() {
 	## IPv4
 	IPv4='IPv4.tmp'
 	downloadto 'https://raw.githubusercontent.com/muink/route-list/release/china_ipv4.txt' "$IPv4"
-	$SED -i '/#.*/d; /^\s*$/d; s|\s||g' "$IPv4"
+	trim "$IPv4"
 
 	## IPv6
 	IPv6='IPv6.tmp'
 	downloadto 'https://raw.githubusercontent.com/muink/route-list/release/china_ipv6.txt' "$IPv6"
-	$SED -i '/#.*/d; /^\s*$/d; s|\s||g' "$IPv6"
+	trim "$IPv6"
 
 	# Merge IPv4 IPv6
-	ChinaIP='ChinaIP.json'
+	ChinaIP='ChinaIP.yml'
 	cat <<-EOF > $ChinaIP
-		{
-		  "__Source__": {
-		    "ipv4": {
-		      "rols": "https://github.com/muink/route-list/blob/release/china_ipv4.txt"
-		    },
-		    "ipv6": {
-		      "rols6": "https://github.com/muink/route-list/blob/release/china_ipv6.txt"
-		    }
-		  },
-		  "__last_modified__": "$(date -u '+%F %T %Z')",
-		  "version": 1,
-		  "rules": [
-		    {
-		      "ip_cidr": [
+	# Type: ipcidr
+	# Last Modified: `date -u '+%F %T %Z'`
+	# Source:
+	# - route-list: https://github.com/muink/route-list/blob/release/china_ipv4.txt
+	# - route-list: https://github.com/muink/route-list/blob/release/china_ipv6.txt
+	payload:
 	EOF
-	$SED -En 's|^|        "|; s|$|",|; p' "$IPv4" >> $ChinaIP
-	$SED -En 's|^|        "|; s|$|",|; p' "$IPv6" >> $ChinaIP
-	$SED -i '${s|,$||}' $ChinaIP
-	cat <<-EOF >> $ChinaIP
-		      ]
-		    }
-		  ]
-		}
-	EOF
-	compilesrs $ChinaIP
+	$SED -En "s|^|- '|; s|$|'|; p" "$IPv4" >> $ChinaIP
+	$SED -En "s|^|- '|; s|$|'|; p" "$IPv6" >> $ChinaIP
+	compilemrs $ChinaIP ipcidr
 
 	# Cleanup
 	rm -f *.tmp
@@ -198,20 +205,24 @@ update_cndomain() {
 	push 01
 	# China Domain
 	## China Domain
-	SRC='ChinaDomain.tmp'
-	DST='ChinaDomain.json'
+	SRC='ChinaList.tmp'
+	DST='ChinaList.yml'
 	downloadto 'https://raw.githubusercontent.com/muink/route-list/release/china_list.txt' "$SRC"
-	$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$SRC"
-	convertDnsmasq "https://github.com/muink/route-list/blob/release/china_list.txt" "$SRC" "$DST"
-	compilesrs "$DST"
+	trim "$SRC"
+	fmt2Domain dnsmasq "$SRC"
+
+	payloadDomain "https://github.com/muink/route-list/blob/release/china_list.txt" "$SRC" "$DST"
+	compilemrs "$DST" domain
 
 	## China Domain Modified 2
-	SRC='ChinaDomainModified2.tmp'
-	DST='ChinaDomainModified2.json'
+	SRC='ChinaList2.tmp'
+	DST='ChinaList2.yml'
 	downloadto 'https://raw.githubusercontent.com/muink/route-list/release/china_list2.txt' "$SRC"
-	$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$SRC"
-	convertDnsmasq "https://github.com/muink/route-list/blob/release/china_list2.txt" "$SRC" "$DST"
-	compilesrs "$DST"
+	trim "$SRC"
+	fmt2Domain dnsmasq "$SRC"
+
+	payloadDomain "https://github.com/muink/route-list/blob/release/china_list2.txt" "$SRC" "$DST"
+	compilemrs "$DST" domain
 
 	# Cleanup
 	rm -f *.tmp
@@ -222,12 +233,14 @@ update_gfwdomain() {
 	push 01
 	# GFW Domain
 	## GFWList
-	downloadto 'https://raw.githubusercontent.com/muink/route-list/release/gfwlist.list' gfwlist.tmp
-	$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$SRC"
-	for f in gfwlist.tmp; do
-		convertList "https://github.com/muink/route-list/blob/release/${f%.*}.list" "$(basename $f)" "$(basename -s.tmp $f).json"
-		compilesrs "$(basename -s.tmp $f).json"
-	done
+	SRC='gfwlist.tmp'
+	DST='gfwlist.yml'
+	downloadto 'https://raw.githubusercontent.com/muink/route-list/release/gfwlist.list' "$SRC"
+	trim "$SRC"
+	fmt2Domain list "$SRC"
+
+	payloadDomain "https://github.com/muink/route-list/blob/release/gfwlist.list" "$SRC" "$DST"
+	compilemrs "$DST" domain
 
 	# Cleanup
 	rm -f *.tmp
@@ -237,54 +250,15 @@ update_gfwdomain() {
 updatev2rayrulesdat() {
 	push v2ray-rules-dat
 	# v2ray-rules-dat
-	SRC='direct-list.tmp'
-	DST='direct-list.json'
-	downloadto 'https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/direct-list.txt' "$SRC"
-	$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$SRC"
-	sort -u "$SRC" -o "$SRC"
-	$SED -En 's|^full:(.+)$|\1|p' "$SRC" > "${SRC%.*}.full.tmp" #&& $SED -i '/^full:/d' "$SRC"
-	grep -E '^[[:alnum:]_\.-]+$' "$SRC" > "${SRC%.*}.suffix.tmp" #&& $SED -Ei '/^[a-zA-Z0-9\.-]+$/d' "$SRC"
-	$SED -En 's|^regexp:(.+)$|\1|;s|\\|\\\\|gp' "$SRC" > "${SRC%.*}.regexp.tmp" #&& $SED -i '/^regexp:/d' "$SRC"
-	cat <<-EOF > "$DST"
-		{
-		  "__Source__": "https://github.com/Loyalsoldier/v2ray-rules-dat/tree/release/direct-list.txt",
-		  "__last_modified__": "$(date -u '+%F %T %Z')",
-		  "version": 1,
-		  "rules": [
-		    {
-		      "domain": [
-	EOF
-	$SED -En 's|^|        "|; s|$|",|; p' "${SRC%.*}.full.tmp" >> "$DST"
-	$SED -i '${s|,$||}' "$DST"
-	cat <<-EOF >> "$DST"
-		      ],
-		      "domain_suffix": [
-	EOF
-	$SED -En 's|^|        "|; s|$|",|; p' "${SRC%.*}.suffix.tmp" >> "$DST"
-	$SED -i '${s|,$||}' "$DST"
-	cat <<-EOF >> "$DST"
-		      ],
-		      "domain_regex": [
-	EOF
-	$SED -En 's|^|        "|; s|$|",|; p' "${SRC%.*}.regexp.tmp" >> "$DST"
-	$SED -i '${s|,$||}' "$DST"
-	cat <<-EOF >> "$DST"
-		      ]
-		    }
-		  ]
-		}
-	EOF
-	compilesrs "$DST"
-
-	downloadto 'https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/reject-list.txt' reject-list.tmp
 	downloadto 'https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/win-spy.txt' win-spy.tmp
 	downloadto 'https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/win-update.txt' win-update.tmp
 	downloadto 'https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/win-extra.txt' win-extra.tmp
-	for f in reject-list.tmp win-spy.tmp win-update.tmp win-extra.tmp; do
-		$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$(basename $f)"
+	for f in win-spy.tmp win-update.tmp win-extra.tmp; do
+		trim "$(basename $f)"
 		sort -u "$(basename $f)" -o "$(basename $f)"
-		convertDnsmasq "https://github.com/Loyalsoldier/v2ray-rules-dat/tree/release/${f%.*}.txt" "$(basename $f)" "$(basename -s.tmp $f).json"
-		compilesrs "$(basename -s.tmp $f).json"
+
+		payloadDomain "https://github.com/Loyalsoldier/v2ray-rules-dat/tree/release/${f%.*}.txt" "$(basename $f)" "$(basename -s.tmp $f).yml"
+		compilemrs "$(basename -s.txt $f).yml" domain
 	done
 
 	# Cleanup
@@ -300,10 +274,11 @@ updateACL4SSR() {
 	downloadto 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ChinaMedia.list' ChinaMedia.tmp
 	downloadto 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/PrivateTracker.list' PrivateTracker.tmp
 	for f in ProxyLite.tmp ProxyMedia.tmp ChinaMedia.tmp Ruleset/PrivateTracker.tmp; do
-		$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$(basename $f)"
+		payloadClassical "https://github.com/ACL4SSR/ACL4SSR/tree/master/Clash/${f%.*}.list" "$(basename $f)" "$(basename -s.tmp $f).yml"
+
+		trim "$(basename $f)"
 		sort -u "$(basename $f)" -o "$(basename $f)"
-		convertList "https://github.com/ACL4SSR/ACL4SSR/tree/master/Clash/${f%.*}.list" "$(basename $f)" "$(basename -s.tmp $f).json"
-		compilesrs "$(basename -s.tmp $f).json"
+		convertClassical "$(basename $f)"
 	done
 
 	# Cleanup
@@ -316,15 +291,17 @@ updateLM_Firefly() {
 	# LM-Firefly
 	downloadto 'https://raw.githubusercontent.com/LM-Firefly/Rules/master/Adblock/Adblock.list' Adblock.tmp
 	downloadto 'https://raw.githubusercontent.com/LM-Firefly/Rules/master/Special/App-Activation.list' App-Activation.tmp
+	downloadto 'https://raw.githubusercontent.com/LM-Firefly/Rules/master/Special/Local-LAN.list' Local-LAN.tmp
 	downloadto 'https://raw.githubusercontent.com/LM-Firefly/Rules/master/Special/NTP-Service.list' NTP-Service.tmp
 	downloadto 'https://raw.githubusercontent.com/LM-Firefly/Rules/master/Game.list' Game.tmp
 	downloadto 'https://raw.githubusercontent.com/LM-Firefly/Rules/master/GlobalMedia.list' GlobalMedia.tmp
 	downloadto 'https://raw.githubusercontent.com/LM-Firefly/Rules/master/SpeedTest.list' SpeedTest.tmp
-	for f in Adblock/Adblock.tmp Special/App-Activation.tmp Special/NTP-Service.tmp Game.tmp GlobalMedia.tmp SpeedTest.tmp; do
-		$SED -i 's|#.*||g; /^\s*$/d; s|\s||g' "$(basename $f)"
+	for f in Adblock/Adblock.tmp Special/App-Activation.tmp Special/Local-LAN.tmp Special/NTP-Service.tmp Game.tmp GlobalMedia.tmp SpeedTest.tmp; do
+		payloadClassical "https://github.com/LM-Firefly/Rules/tree/master/${f%.*}.list" "$(basename $f)" "$(basename -s.tmp $f).yml"
+
+		trim "$(basename $f)"
 		sort -u "$(basename $f)" -o "$(basename $f)"
-		convertList "https://github.com/LM-Firefly/Rules/tree/master/${f%.*}.list" "$(basename $f)" "$(basename -s.tmp $f).json"
-		compilesrs "$(basename -s.tmp $f).json"
+		convertClassical "$(basename $f)"
 	done
 
 	# Cleanup
@@ -334,26 +311,11 @@ updateLM_Firefly() {
 
 
 
-# init
-getSysinfo
-[ "$OS" = "darwin" ] && SED=gsed || SED=sed
-if [ -n "${OS:+$OS-}$ARCH" ]; then
-	SINGBOX="${OS:+$OS-}$ARCH"
-	[ "$OS" == "windows" ] && SINGBOX="${SINGBOX}.exe"
-
-	"$CURRENTDIR/$SINGBOX" version >/dev/null 2>&1 || {
-		git fetch --no-tags --prune --no-recurse-submodules --depth=1 origin singbox
-		git checkout origin/singbox -- $SINGBOX 2>/dev/null
-		git reset HEAD $SINGBOX 2>/dev/null
-		chmod +x $SINGBOX 2>/dev/null
-	}
-	SINGBOX="$CURRENTDIR/$SINGBOX"
-fi
-
+# Main
 cd "$DSTDIR"
 update_ipcidr
 update_cndomain
 update_gfwdomain
-updatev2rayrulesdat
+#updatev2rayrulesdat
 updateACL4SSR
 updateLM_Firefly
