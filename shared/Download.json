@@ -3,6 +3,8 @@
   "rules": [
     {
       "domain": [
+        "__SteamDL.cname__",
+        "lancache.steamcontent.com",
         "__Google-DL__",
         "dl.google.com",
         "__Openwrt__",
@@ -14,7 +16,8 @@
       ],
       "domain_suffix": [
         "__Steam__",
-        ".steamcontent.com",
+        "steampipe.akamaized.net",
+        ".cdn.steampipe.steamcontent.com",
         "__Youtube__",
         ".ggpht.com",
         ".googlevideo.com",
