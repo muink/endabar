@@ -1,0 +1,25 @@
+# Type: domain
+payload:
+# SteamDL.cname
+- lancache.steamcontent.com
+# Google-DL
+- dl.google.com
+# Openwrt
+- downloads.openwrt.org
+# Oculus
+- securecdn.oculus.com
+# Nvidia
+- international-gfe.download.nvidia.com
+# Steam
+- '+.steampipe.akamaized.net'
+- '.cdn.steampipe.steamcontent.com'
+# Youtube
+- '.ggpht.com'
+- '.googlevideo.com'
+- '.ytimg.com'
+# Google-drive
+- '.googleusercontent.com'
+# cloud.mail.ru
+- '+.mail.ru'
+- '.datacloudmail.ru'
+- '.imgsmail.ru'

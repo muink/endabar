@@ -1,0 +1,21 @@
+# Type: classical
+payload:
+# Steam
+- DOMAIN-SUFFIX,.steampowered.com
+- DOMAIN-SUFFIX,.steamcommunity.com
+- DOMAIN-SUFFIX,.steam-api.com
+- DOMAIN-SUFFIX,.steam-chat.com
+- DOMAIN-SUFFIX,.steamdeck.com
+- DOMAIN-SUFFIX,.steamgames.com
+- DOMAIN-SUFFIX,.steamusercontent.com
+- DOMAIN-SUFFIX,.steamstatic.com
+# SteamDownload
+- DOMAIN-SUFFIX,.steamcontent.com
+- DOMAIN-SUFFIX,.akamaihd.net
+# Steam.27000-27100
+- DOMAIN-SUFFIX,.steamserver.net
+# Others
+- DOMAIN-SUFFIX,.srv.nintendo.net
+- DOMAIN-SUFFIX,.stun.playstation.net
+- DOMAIN-SUFFIX,xboxlive.com
+- DOMAIN-REGEX,^xbox\..+\.microsoft\.com$

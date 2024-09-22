@@ -1,0 +1,16 @@
+captive.apple.com
+network-test.debian.org
+nmcheck.gnome.org
+www.archlinux.org
+ping.archlinux.org
+networkcheck.kde.org
+detectportal.firefox.com
+start.ubuntu.com
+capnet.elementary.io
+edge.microsoft.com
+connectivitycheck.gstatic.com
+connectivitycheck.android.com
+connect.rom.miui.com
+connectivitycheck.platform.hicloud.com
+.msftconnecttest.com
+.msftncsi.com

@@ -1,0 +1,2 @@
+safebrowsing.googleapis.com
+safebrowsing.urlsec.qq.com

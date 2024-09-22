@@ -1,0 +1,5 @@
++.pushbullet.com
++.gettoby.com
++.microsoft.com
++.live.com
++.hinet.net
