@@ -4,3 +4,4 @@ clash.metacubex.one
 yacd.metacubex.one
 d.metacubex.one
 metacubexd.pages.dev
+board.zash.run.place
