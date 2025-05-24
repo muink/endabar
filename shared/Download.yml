@@ -5,6 +5,7 @@ payload:
 # Google-DL
 - dl.google.com
 # Openwrt
+- rsync.openwrt.org
 - downloads.openwrt.org
 # Oculus
 - securecdn.oculus.com
