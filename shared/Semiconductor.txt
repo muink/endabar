@@ -5,3 +5,5 @@
 +.msi.com
 +.gigabyte.com
 +.nvidia.com
++.oneplus.com
++.samsung.com
