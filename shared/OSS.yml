@@ -1,0 +1,9 @@
+# Type: domain
+payload:
+# Github
+- '+.github.com'
+- '.githubusercontent.com'
+- '.githubassets.com'
+# Openwrt
+- rsync.openwrt.org
+- downloads.openwrt.org
