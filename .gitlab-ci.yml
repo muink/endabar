@@ -1,0 +1,67 @@
+image: ubuntu:latest
+
+variables:
+  # 避免交互式安装时的卡顿
+  DEBIAN_FRONTEND: noninteractive
+  # 定义提交代码的用户名
+  GIT_USER_NAME: "GitLab CI Bot"
+  GIT_USER_EMAIL: "gitlab-ci@example.com" # 或者使用 CI 变量
+
+# 定义执行前的通用准备工作
+before_script:
+  # 安装必要的工具 (git, jq, curl 等)
+  - apt-get update && apt-get install -y git jq unzip gzip curl
+  # 配置 Git 用户信息
+  - git config --global user.name "${GIT_USER_NAME}"
+  - git config --global user.email "${GIT_USER_EMAIL}"
+  # 配置远程仓库 URL，使用 Access Token 以便拥有推送权限
+  # ${CI_SERVER_HOST} 是 gitlab.com 或你的私有实例域名
+  # ${CI_PROJECT_PATH} 是 group/project
+  - git remote set-url origin "https://oauth2:${PAC_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+
+stages:
+  - deploy
+
+# Job 1: 对应原 GitHub 的 Generate rules
+generate_rules:
+  stage: deploy
+  rules:
+    # 规则：如果是定时任务且变量 JOB_TYPE 为 gen_rules 时执行
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $JOB_TYPE == "gen_rules"
+    # 规则：允许手动在 Web 界面触发
+    - if: $CI_PIPELINE_SOURCE == "web"
+  script:
+    - chmod +x ./gen_rules.sh
+    - bash ./gen_rules.sh
+    # 检查是否有变动，有变动才提交
+    - |
+      if [[ -n $(git status -s) ]]; then
+        git add .
+        git commit -m "$(date +%F)"
+        git push origin HEAD:$CI_COMMIT_REF_NAME
+        echo "Changes pushed successfully."
+      else
+        echo "No changes to commit."
+      fi
+
+# Job 2: 对应原 GitHub 的 Squash commits
+squash_commits:
+  stage: deploy
+  # 必须拉取完整历史记录，否则 git log 无法找到旧的 commit
+  variables:
+    GIT_DEPTH: 0
+  rules:
+    # 规则：如果是定时任务且变量 JOB_TYPE 为 squash 时执行
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $JOB_TYPE == "squash"
+    # 规则：允许手动在 Web 界面触发 (注意：手动触发需要定义 JOB_TYPE 变量或修改此处逻辑)
+    - if: $CI_PIPELINE_SOURCE == "web"
+  script:
+    # 寻找特定 commit hash
+    - TARGET_COMMIT=$(git log --grep 'THE HORiZON' | head -1 | sed 's|^commit *||')
+    
+    - if [ -z "$TARGET_COMMIT" ]; then echo "Target commit not found!"; exit 1; fi
+    
+    # 软重置并强制提交
+    - git reset --soft $TARGET_COMMIT
+    - git commit -m "$(date +%F)"
+    - git push -f origin HEAD:$CI_COMMIT_REF_NAME
