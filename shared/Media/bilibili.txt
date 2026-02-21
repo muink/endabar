@@ -1,7 +1,8 @@
-DOMAIN-SUFFIX,.biliapi.net
-DOMAIN-SUFFIX,.bilibili.com
-DOMAIN-SUFFIX,.bilivideo.com
-DOMAIN-SUFFIX,.acgvideo.com
-DOMAIN-SUFFIX,.hdslb.com
+DOMAIN-SUFFIX,biliapi.net
+DOMAIN-SUFFIX,bilibili.com
+DOMAIN-SUFFIX,bilivideo.com
+DOMAIN-SUFFIX,biligame.com
+DOMAIN-SUFFIX,acgvideo.com
+DOMAIN-SUFFIX,hdslb.com
 PROCESS-NAME,com.bilibili.app.in
 PROCESS-NAME,tv.danmaku.bili
