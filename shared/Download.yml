@@ -21,3 +21,5 @@ payload:
 - '+.mail.ru'
 - '.datacloudmail.ru'
 - '.imgsmail.ru'
+# FlatHub
+- dl.flathub.org
