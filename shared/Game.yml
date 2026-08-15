@@ -1,5 +1,10 @@
 # Type: classical
 payload:
+# Osu!
+- DOMAIN,osu.ppy.sh
+- DOMAIN,auth.ppy.sh
+- DOMAIN,notify.ppy.sh
+- DOMAIN,spectator.osu.ppy.sh
 # Steam
 - DOMAIN-SUFFIX,.steampowered.com
 - DOMAIN-SUFFIX,.steamcommunity.com

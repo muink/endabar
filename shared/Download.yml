@@ -1,5 +1,8 @@
 # Type: domain
 payload:
+# Osu!
+- assets.ppy.sh
+- bm*.ppy.sh
 # SteamDL.cname
 - lancache.steamcontent.com
 # Google-DL
