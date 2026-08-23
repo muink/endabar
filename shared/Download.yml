@@ -1,28 +1,28 @@
-# Type: domain
+# Type: classical
 payload:
 # Osu!
-- assets.ppy.sh
-- bm*.ppy.sh
+- DOMAIN,assets.ppy.sh
+- DOMAIN-WILDCARD,bm*.ppy.sh
 # SteamDL.cname
-- lancache.steamcontent.com
+- DOMAIN,lancache.steamcontent.com
 # Google-DL
-- dl.google.com
+- DOMAIN,dl.google.com
 # Oculus
-- securecdn.oculus.com
+- DOMAIN,securecdn.oculus.com
 # Nvidia
-- international-gfe.download.nvidia.com
+- DOMAIN,international-gfe.download.nvidia.com
 # Steam
-- '+.steampipe.akamaized.net'
-- '.cdn.steampipe.steamcontent.com'
+- DOMAIN-SUFFIX,steampipe.akamaized.net
+- DOMAIN-WILDCARD,*.cdn.steampipe.steamcontent.com
 # Youtube
-- '.ggpht.com'
-- '.googlevideo.com'
-- '.ytimg.com'
+- DOMAIN-WILDCARD,*.ggpht.com
+- DOMAIN-WILDCARD,*.googlevideo.com
+- DOMAIN-WILDCARD,*.ytimg.com
 # Google-drive
-- '.googleusercontent.com'
+- DOMAIN-WILDCARD,*.googleusercontent.com
 # cloud.mail.ru
-- '+.mail.ru'
-- '.datacloudmail.ru'
-- '.imgsmail.ru'
+- DOMAIN-SUFFIX,mail.ru
+- DOMAIN-WILDCARD,*.datacloudmail.ru
+- DOMAIN-WILDCARD,*.imgsmail.ru
 # FlatHub
-- dl.flathub.org
+- DOMAIN,dl.flathub.org
