@@ -1,5 +1,5 @@
 # Type: domain
-# Last Modified: 2026-08-26 03:44:12 UTC
+# Last Modified: 2026-09-01 08:05:46 UTC
 # Source:
 # - https://github.com/muink/route-list/blob/release/gfwlist.list
 payload:
@@ -1979,6 +1979,7 @@ payload:
 - '+.getlantern.org'
 - '+.getmalus.com'
 - '+.getmdl.io'
+- '+.getmonero.org'
 - '+.getoutline.org'
 - '+.getsession.org'
 - '+.getsync.com'
@@ -3121,6 +3122,7 @@ payload:
 - '+.nhentai.net'
 - '+.nic.cz.cc'
 - '+.nic.gov'
+- '+.nicoseiga.jp'
 - '+.nicovideo.jp'
 - '+.nightswatch.top'
 - '+.nikke-en.com'
@@ -4517,6 +4519,7 @@ payload:
 - '+.wp.com'
 - '+.wplace.live'
 - '+.wpoforum.com'
+- '+.write.as'
 - '+.writesonic.com'
 - '+.wsj.com'
 - '+.wsj.net'
