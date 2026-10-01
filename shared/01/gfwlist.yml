@@ -1,5 +1,5 @@
 # Type: domain
-# Last Modified: 2026-09-26 08:06:20 UTC
+# Last Modified: 2026-10-01 09:35:18 UTC
 # Source:
 # - https://github.com/muink/route-list/blob/release/gfwlist.list
 payload:
@@ -1197,6 +1197,7 @@ payload:
 - '+.c-est-simple.com'
 - '+.c-span.org'
 - '+.c-spanvideo.org'
+- '+.c.go-mpulse.net'
 - '+.c.mi.com'
 - '+.c2cx.com'
 - '+.c3pool.com'
@@ -1926,6 +1927,7 @@ payload:
 - '+.futustatic.com'
 - '+.fututrade.com'
 - '+.fututrustee.com'
+- '+.fuyin116.com'
 - '+.fw.cm'
 - '+.fxcm-chinese.com'
 - '+.fxnetworks.com'
@@ -3022,6 +3024,7 @@ payload:
 - '+.mubi.com'
 - '+.mullvad.net'
 - '+.multiply.com'
+- '+.muse.ai'
 - '+.music.amazon.com'
 - '+.musixmatch.com'
 - '+.muzi.com'
@@ -3477,6 +3480,7 @@ payload:
 - '+.qiangyou.org'
 - '+.qianmo.tw'
 - '+.qiwen.lu'
+- '+.qobuz.com'
 - '+.qoos.com'
 - '+.qq.co.za'
 - '+.qstatus.com'
@@ -4288,6 +4292,7 @@ payload:
 - '+.vansky.com'
 - '+.vaticannews.va'
 - '+.vatn.org'
+- '+.vava8.com'
 - '+.vcf-online.org'
 - '+.vcfbuilder.org'
 - '+.veed.io'
