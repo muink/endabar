@@ -1,5 +1,5 @@
 # Type: classical
-# Last Modified: 2026-10-11 09:29:02 UTC
+# Last Modified: 2026-10-16 07:39:47 UTC
 # Source:
 # - https://github.com/LM-Firefly/Rules/tree/master/GlobalMedia.list
 payload:
@@ -1730,6 +1730,11 @@ payload:
 - DOMAIN-SUFFIX,tiktokv.us
 - DOMAIN-SUFFIX,trae.ai
 - DOMAIN-SUFFIX,ttwebview.com
+  ## >> CapCut
+- DOMAIN-SUFFIX,capcut.com
+- DOMAIN-SUFFIX,capcutapi.com
+- DOMAIN-SUFFIX,capcutapi.us
+- DOMAIN-SUFFIX,capcutstatic.com
   ## > TVB
 - DOMAIN-SUFFIX,bigbigchannel.com.hk
 - DOMAIN-SUFFIX,bigbigshop.com
