@@ -1,5 +1,5 @@
 # Type: domain
-# Last Modified: 2026-10-26 08:15:49 UTC
+# Last Modified: 2026-11-01 09:53:16 UTC
 # Source:
 # - https://github.com/muink/route-list/blob/release/gfwlist.list
 payload:
@@ -875,6 +875,7 @@ payload:
 - '+.anonfiles.com'
 - '+.anonymouse.org'
 - '+.anthonycalzadilla.com'
+- '+.anthropic.auth0.com'
 - '+.anthropic.com'
 - '+.antpool.com'
 - '+.anuneko.com'
@@ -895,6 +896,7 @@ payload:
 - '+.api.recaptcha.net'
 - '+.api.shuaiapi.com'
 - '+.api.steampowered.com'
+- '+.api.themoviedb.org'
 - '+.apiary.io'
 - '+.apigee.com'
 - '+.apk.support'
@@ -1162,6 +1164,7 @@ payload:
 - '+.brookings.edu'
 - '+.brutaltgp.com'
 - '+.bsky.app'
+- '+.bsky.chat'
 - '+.bsky.network'
 - '+.bsky.social'
 - '+.bt4g.org'
@@ -1373,7 +1376,10 @@ payload:
 - '+.clashyun.com'
 - '+.classicalguitarblog.net'
 - '+.claude.ai'
+- '+.claude.app'
 - '+.claude.com'
+- '+.claudemcpcontent.com'
+- '+.claudeusercontent.com'
 - '+.cldr.unicode.org'
 - '+.clearsurance.com'
 - '+.clementine-player.org'
@@ -4147,6 +4153,7 @@ payload:
 - '+.torproject.org'
 - '+.torrentgalaxy.to'
 - '+.torrentkitty.tv'
+- '+.torrentleech.org'
 - '+.torrentprivacy.com'
 - '+.torrenty.org'
 - '+.tortoisesvn.net'
@@ -4712,6 +4719,7 @@ payload:
 - '+.youtubegaming.com'
 - '+.youtubekids.com'
 - '+.youversion.com'
+- '+.youversionapi.com'
 - '+.youwin.com'
 - '+.youxu.info'
 - '+.yt.be'
