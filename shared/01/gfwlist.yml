@@ -1,5 +1,5 @@
 # Type: domain
-# Last Modified: 2026-11-01 09:53:16 UTC
+# Last Modified: 2026-11-06 10:06:33 UTC
 # Source:
 # - https://github.com/muink/route-list/blob/release/gfwlist.list
 payload:
@@ -1064,6 +1064,7 @@ payload:
 - '+.bignews.org'
 - '+.bigone.com'
 - '+.bild.de'
+- '+.bilibili.tv'
 - '+.bilinovel.com'
 - '+.binance.com'
 - '+.binance.org'
@@ -2918,7 +2919,6 @@ payload:
 - '+.matters.town'
 - '+.matthewdgreen.wordpress.com'
 - '+.mattwilcox.net'
-- '+.maven.neoforged.net'
 - '+.mcadforums.com'
 - '+.mceindex.com'
 - '+.mcusercontent.com'
@@ -3117,6 +3117,7 @@ payload:
 - '+.nekoslovakia.net'
 - '+.neo-miracle.com'
 - '+.neodb.social'
+- '+.neoforged.net'
 - '+.neowin.net'
 - '+.nephobox.com'
 - '+.netalert.me'
